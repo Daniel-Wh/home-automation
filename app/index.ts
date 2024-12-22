@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client'
 import { createValidator } from 'express-joi-validation';
 import { validateKey } from './authmiddleware';
 import { UserPostBody, PostUser } from './user/usercontroller';
+import { PostCollection, PostCollectionBody, PutCollectionBody, UpdateCollectionValue } from './collection/collectionController';
 
 export const prisma = new PrismaClient().$extends({
     query: {
@@ -37,5 +38,6 @@ app.get('/health', async (req, res) => {
 });
 
 
-
 app.post('/user', validateKey, validator.body(UserPostBody), PostUser)
+app.post('/collection', validateKey, validator.body(PostCollectionBody), PostCollection)
+app.put('/collection', validateKey, validator.body(PutCollectionBody), UpdateCollectionValue)

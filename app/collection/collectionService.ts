@@ -47,3 +47,20 @@ export async function UpdateCollection(userId: string, name: string, value: numb
         }
     })
 }
+
+export async function GetCollectionByNameAndUser(userId: string, name: string) {
+    const user = await prisma.user.findUniqueOrThrow({
+        where: {
+            id: userId
+        }
+    })
+
+    const collection = await prisma.collection.findFirstOrThrow({
+        where: {
+            userId: user.id,
+            name
+        }
+    })
+
+    return collection
+}

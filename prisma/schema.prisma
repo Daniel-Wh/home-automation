@@ -20,6 +20,8 @@ model Collection {
   balance Int    @default(0)
   userId  String
   User    User   @relation(fields: [userId], references: [id])
+
+  @@unique([name, userId])
 }
 
 model User {

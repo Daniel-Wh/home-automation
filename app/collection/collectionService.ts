@@ -6,7 +6,7 @@ export enum CollectionAction {
 }
 
 
-export async function CreateCollection(userId: string, name: string,) {
+export async function CreateCollection(userId: string, name: string, budget: number) {
 
     const user = await prisma.user.findUniqueOrThrow({
         where: {
@@ -18,6 +18,7 @@ export async function CreateCollection(userId: string, name: string,) {
         data: {
             name,
             userId: user.id,
+            budget
         }
     })
 

@@ -1,4 +1,4 @@
-import { prisma } from "..";
+import { prisma } from "../app";
 
 export enum CollectionAction {
     increment = "increment",

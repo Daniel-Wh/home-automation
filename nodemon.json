@@ -1,0 +1,10 @@
+{
+    "watch": [
+        "app"
+    ],
+    "ext": "ts",
+    "ignore": [
+        "/dist"
+    ],
+    "exec": "set DEBUG=http & set NODE_ENV=dev && ts-node app/app.local.ts"
+}

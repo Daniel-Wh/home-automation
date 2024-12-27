@@ -1,4 +1,4 @@
-import { prisma } from "..";
+import { prisma } from "../app";
 
 
 export async function AddUser(name: string, email: string, phoneNumber: string) {

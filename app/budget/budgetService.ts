@@ -11,14 +11,14 @@ export async function getBudgetResults(userId: string) {
     let totalBudget = 0
     let totalSpent = 0
 
-    const results = collections.map(collection => {
-        const column = collection.name
-        const finalBalance = collection.budget - collection.balance
+    const results = collections.map(result => {
+        const collection = result.name
+        const finalBalance = result.budget - result.balance
 
-        totalBudget += collection.budget
-        totalSpent += collection.balance
+        totalBudget += result.budget
+        totalSpent += result.balance
 
-        return { column, finalBalance }
+        return `collection ${collection} has a remaining balance of ${finalBalance} dollars`
     })
 
     return { totalBudget, totalSpent, results }
@@ -36,5 +36,7 @@ export async function clearBudget(userId: string) {
         }
     })
 
-    return collections
+    const results = { message: `${collections.count} collections set to 0 balance` }
+
+    return results
 }

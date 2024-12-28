@@ -59,7 +59,7 @@ export async function GetCollectionByNameAndUser(userId: string, name: string) {
     const collection = await prisma.collection.findFirstOrThrow({
         where: {
             userId: user.id,
-            name
+            name: name.toLowerCase()
         }
     })
 

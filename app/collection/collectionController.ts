@@ -23,6 +23,7 @@ export const GetCollectionBody = Joi.object({
 export async function PostCollection(req: Request, res: Response) {
     try {
         const { name, userId, budget } = req.body
+        const normalizedCollectionName = name.toLowerCase()
         const collection = await CreateCollection(userId, name, budget)
         res.status(201).json({ message: 'collection created', collection })
     } catch (error) {
@@ -33,17 +34,18 @@ export async function PostCollection(req: Request, res: Response) {
 export async function UpdateCollectionValue(req: Request, res: Response) {
     try {
         const { userId, name, value, action } = req.body
-
-        const collection = await UpdateCollection(userId, name, value, action)
+        const normalizedCollectionName = name.toLowerCase()
+        const collection = await UpdateCollection(userId, normalizedCollectionName, value, action)
         res.status(201).json({ message: `You have ${collection.budget - collection.balance} dollars remaining on budget item ${collection.name}` })
     } catch (error) {
-        res.status(500).json({ message: 'something went wrong' })
+        res.status(500).json({ message: 'something went wrong', body: req.body })
     }
 }
 
 export async function GetCollectionBalance(req: Request, res: Response) {
     try {
         const { userId, name } = req.body
+        const normalizedCollectionName = name.toLowerCase()
         const collection = await GetCollectionByNameAndUser(userId, name)
         res.status(200).json({ message: `you have ${collection.budget - collection.balance} dollars remaining on budget item ${collection.name}` })
     } catch (error) {

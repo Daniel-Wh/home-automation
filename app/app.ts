@@ -15,7 +15,7 @@ import { createValidator } from 'express-joi-validation';
 import { validateKey } from './authmiddleware';
 import { UserPostBody, PostUser } from './user/usercontroller';
 import { GetCollectionBalance, GetCollectionBody, PostCollection, PostCollectionBody, PutCollectionBody, UpdateCollectionValue } from './collection/collectionController';
-import { getCurrentBudgetBody, getCurrentBudgetStatus } from './budget/budgetController';
+import { clearBudgetBody, clearCurrentBudget, getCurrentBudgetBody, getCurrentBudgetStatus } from './budget/budgetController';
 
 export const prisma = new PrismaClient().$extends({
     query: {
@@ -39,20 +39,22 @@ export const prisma = new PrismaClient().$extends({
 
 const validator = createValidator()
 
+enum Routes {
+    collection = '/collection',
+    budget = '/budget',
+    user = '/user'
+}
 
-
-
-router.get('/health', async (req, res) => {
+router.get('/health', async (_, res) => {
 
     res.send({ status: 'ok' })
 });
-
-
-router.post('/user', validateKey, validator.body(UserPostBody), PostUser)
-router.post('/collection', validateKey, validator.body(PostCollectionBody), PostCollection)
-router.put('/collection', validateKey, validator.body(PutCollectionBody), UpdateCollectionValue)
-router.get('/collection', validateKey, validator.body(GetCollectionBody), GetCollectionBalance)
-router.get('/budget', validateKey, validator.body(getCurrentBudgetBody), getCurrentBudgetStatus)
+router.post(Routes.user, validateKey, validator.body(UserPostBody), PostUser)
+router.post(Routes.collection, validateKey, validator.body(PostCollectionBody), PostCollection)
+router.put(Routes.collection, validateKey, validator.body(PutCollectionBody), UpdateCollectionValue)
+router.get(Routes.collection, validateKey, validator.body(GetCollectionBody), GetCollectionBalance)
+router.post(Routes.budget, validateKey, validator.body(getCurrentBudgetBody), getCurrentBudgetStatus)
+router.patch(Routes.budget, validateKey, validator.body(clearBudgetBody), clearCurrentBudget)
 app.use('', router)
 if (process.env.NODE_ENV === 'production') {
     app.use('/default', router)

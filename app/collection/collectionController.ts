@@ -24,10 +24,10 @@ export async function PostCollection(req: Request, res: Response) {
     try {
         const { name, userId, budget } = req.body
         const normalizedCollectionName = name.toLowerCase()
-        const collection = await CreateCollection(userId, name, budget)
+        const collection = await CreateCollection(userId, normalizedCollectionName, budget)
         res.status(201).json({ message: 'collection created', collection })
     } catch (error) {
-        res.status(500).json({ message: 'something went wrong' })
+        res.status(500).json({ message: 'something went wrong', error })
     }
 }
 

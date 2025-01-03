@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Joi from 'joi'
-import { AddUser } from "./userService";
+import { AddRootUser } from "./userService";
 
 export const UserPostBody = Joi.object({
     name: Joi.string().min(3).max(40).required(),
@@ -13,15 +13,12 @@ export const UserPostBody = Joi.object({
 export async function PostUser(req: Request, res: Response) {
 
     try {
-        console.log(req.body)
-        const { name, email, password, phoneNumber } = req.body
-        const user = await AddUser(name, email, phoneNumber)
+        const { name, email, phoneNumber } = req.body
+        const user = await AddRootUser(name, email, phoneNumber)
 
-        res.status(201).json({ message: 'user created', user: { ...user, password: null } })
+        res.status(201).json({ message: 'user created', user: { ...user } })
     } catch (error) {
         res.status(500).json({ message: 'something went wrong' })
     }
-
-
 
 }

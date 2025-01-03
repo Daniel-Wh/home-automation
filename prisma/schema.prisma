@@ -32,4 +32,36 @@ model User {
   email       String       @unique
   phone       String
   Collections Collection[]
+  AuditLogs   AuditLog[]
+  NotificationSchedule NotificationSchedule[]
+  operations  Int         @default(0)
+  lastOperationAt DateTime?
+  key key[]
+}
+
+model key {
+  id          String @unique
+  permissions String[]
+  createdAt   DateTime @default(now())
+  deletedAt   DateTime?
+  userId      String
+  User        User     @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id          String @id @default(uuid())
+  action      String
+  objectId    String
+  content     String
+  userId      String
+  createdAt   DateTime @default(now())
+  User        User     @relation(fields: [userId], references: [id])
+}
+
+model NotificationSchedule {
+  id          String   @id @default(uuid())
+  userId      String
+  contactType String[] // email, sms, etc...
+  frequency   String // daily, weekly, monthly
+  User        User     @relation(fields: [userId], references: [id])
 }

@@ -12,10 +12,11 @@ const router = express.Router()
 
 import { PrismaClient } from '@prisma/client'
 import { createValidator } from 'express-joi-validation';
-import { validateKey } from './authmiddleware';
+import { requireScope, validateKey } from './authmiddleware';
 import { UserPostBody, PostUser } from './user/usercontroller';
 import { GetCollectionBalance, GetCollectionBody, PostCollection, PostCollectionBody, PutCollectionBody, UpdateCollectionValue } from './collection/collectionController';
 import { clearBudgetBody, clearCurrentBudget, getCurrentBudgetBody, getCurrentBudgetStatus } from './budget/budgetController';
+import { UserPermissions } from './user/userTypes';
 
 export const prisma = new PrismaClient().$extends({
     query: {
@@ -50,11 +51,11 @@ router.get('/health', async (_, res) => {
     res.send({ status: 'ok' })
 });
 router.post(Routes.user, validateKey, validator.body(UserPostBody), PostUser)
-router.post(Routes.collection, validateKey, validator.body(PostCollectionBody), PostCollection)
-router.put(Routes.collection, validateKey, validator.body(PutCollectionBody), UpdateCollectionValue)
-router.get(Routes.collection, validateKey, validator.body(GetCollectionBody), GetCollectionBalance)
-router.post(Routes.budget, validateKey, validator.body(getCurrentBudgetBody), getCurrentBudgetStatus)
-router.patch(Routes.budget, validateKey, validator.body(clearBudgetBody), clearCurrentBudget)
+router.post(Routes.collection, validateKey, requireScope(UserPermissions.COLLECTION_WRITE), validator.body(PostCollectionBody), PostCollection)
+router.put(Routes.collection, validateKey, requireScope(UserPermissions.COLLECTION_WRITE), validator.body(PutCollectionBody), UpdateCollectionValue)
+router.get(Routes.collection, validateKey, requireScope(UserPermissions.COLLECTION_READ), validator.body(GetCollectionBody), GetCollectionBalance)
+router.post(Routes.budget, validateKey, requireScope(UserPermissions.BUDGET_READ), validator.body(getCurrentBudgetBody), getCurrentBudgetStatus)
+router.delete(Routes.budget, validateKey, requireScope(UserPermissions.BUDGET_DELETE), validator.body(clearBudgetBody), clearCurrentBudget)
 app.use('', router)
 if (process.env.NODE_ENV === 'production') {
     app.use('/default', router)

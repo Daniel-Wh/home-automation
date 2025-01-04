@@ -3,6 +3,7 @@
 export enum NotificationSchedule {
     DAILY = 'DAILY',
     WEEKLY = 'WEEKLY',
+    BIWEEKLY = 'BIWEEKLY',
     MONTHLY = 'MONTHLY',
     NONE = 'NONE'
 }

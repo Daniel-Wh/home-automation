@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import Joi from 'joi'
-import { CollectionAction, CreateCollection, GetCollectionByNameAndUser, UpdateCollection } from './collectionService'
+import { CollectionAction, CreateCollection, GetCollectionByNameAndUser, UpdateCollectionBalance } from './collectionService'
 
 export const PostCollectionBody = Joi.object({
     userId: Joi.string().required(),
@@ -35,7 +35,7 @@ export async function UpdateCollectionValue(req: Request, res: Response) {
     try {
         const { userId, name, value, action } = req.body
         const normalizedCollectionName = name.toLowerCase()
-        const collection = await UpdateCollection(userId, normalizedCollectionName, value, action)
+        const collection = await UpdateCollectionBalance(userId, normalizedCollectionName, value, action)
         res.status(201).json({ message: `You have ${collection.budget - collection.balance} dollars remaining on budget item ${collection.name}` })
     } catch (error) {
         res.status(500).json({ message: 'something went wrong', body: req.body })

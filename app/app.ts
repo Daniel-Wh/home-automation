@@ -17,6 +17,7 @@ import { UserPostBody, PostUser } from './user/usercontroller';
 import { GetCollectionBalance, GetCollectionBody, PostCollection, PostCollectionBody, PutCollectionBody, UpdateCollectionValue } from './collection/collectionController';
 import { clearBudgetBody, clearCurrentBudget, getCurrentBudgetBody, getCurrentBudgetStatus } from './budget/budgetController';
 import { UserPermissions } from './user/userTypes';
+import { NotificationChronPost, SendNotificationPost } from './admin/notificationController';
 
 export const prisma = new PrismaClient().$extends({
     query: {
@@ -43,7 +44,8 @@ const validator = createValidator()
 enum Routes {
     collection = '/collection',
     budget = '/budget',
-    user = '/user'
+    user = '/user',
+    notifications = '/admin/notifications'
 }
 
 router.get('/health', async (_, res) => {
@@ -56,6 +58,7 @@ router.put(Routes.collection, validateKey, requireScope(UserPermissions.COLLECTI
 router.get(Routes.collection, validateKey, requireScope(UserPermissions.COLLECTION_READ), validator.body(GetCollectionBody), GetCollectionBalance)
 router.post(Routes.budget, validateKey, requireScope(UserPermissions.BUDGET_READ), validator.body(getCurrentBudgetBody), getCurrentBudgetStatus)
 router.delete(Routes.budget, validateKey, requireScope(UserPermissions.BUDGET_DELETE), validator.body(clearBudgetBody), clearCurrentBudget)
+router.post(Routes.notifications, validateKey, validator.body(SendNotificationPost), NotificationChronPost)
 app.use('', router)
 if (process.env.NODE_ENV === 'production') {
     app.use('/default', router)

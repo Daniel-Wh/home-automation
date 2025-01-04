@@ -1,10 +1,10 @@
 import { prisma } from "../app";
 import { subtle } from "crypto";
-import { NotificationMethod, NotificationSchedule, UserPermissions } from "./userTypes";
+import { NotificationMethod, NotificationScheduleType, UserPermissions } from "./userTypes";
 
 const defaultNotificationSchedule = {
-    contactType: [NotificationMethod.EMAIL],
-    frequency: NotificationSchedule.WEEKLY
+    contactType: [NotificationMethod.SMS],
+    frequency: NotificationScheduleType.WEEKLY
 }
 
 export async function AddRootUser(name: string, email: string, phoneNumber: string) {

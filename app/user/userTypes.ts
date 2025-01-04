@@ -1,6 +1,6 @@
 
 
-export enum NotificationSchedule {
+export enum NotificationScheduleType {
     DAILY = 'DAILY',
     WEEKLY = 'WEEKLY',
     BIWEEKLY = 'BIWEEKLY',

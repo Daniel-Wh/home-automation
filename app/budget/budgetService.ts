@@ -8,6 +8,11 @@ export async function getBudgetResults(userId: string) {
         }
     })
 
+    await prisma.user.update({
+        where: { id: userId },
+        data: { operations: { increment: 1 }, lastOperationAt: new Date() }
+    })
+
     let totalBudget = 0
     let totalSpent = 0
 
@@ -27,7 +32,9 @@ export async function getBudgetResults(userId: string) {
 
 
 export async function clearBudget(userId: string) {
-    const collections = await prisma.collection.updateMany({
+    const { totalBudget, totalSpent } = await getBudgetResults(userId)
+
+    await prisma.collection.updateMany({
         where: {
             userId
         },
@@ -36,7 +43,15 @@ export async function clearBudget(userId: string) {
         }
     })
 
-    const results = { message: `${collections.count} collections set to 0 balance` }
+    await prisma.user.update({
+        where: { id: userId },
+        data: {
+            operations: { increment: 1 },
+            lastOperationAt: new Date()
+        }
+    })
+
+    const results = { message: `${totalSpent} dollars spent of allotted ${totalBudget}. Collections set to 0 balance` }
 
     return results
 }

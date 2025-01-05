@@ -10,7 +10,6 @@ export enum NotificationScheduleType {
 
 export enum NotificationMethod {
     EMAIL = 'EMAIL',
-    SMS = 'SMS',
     PUSH = 'PUSH',
     INAPP = 'INAPP',
     NONE = 'NONE'

@@ -3,7 +3,7 @@ import { subtle } from "crypto";
 import { NotificationMethod, NotificationScheduleType, UserPermissions } from "./userTypes";
 
 const defaultNotificationSchedule = {
-    contactType: [NotificationMethod.SMS],
+    contactType: [NotificationMethod.NONE],
     frequency: NotificationScheduleType.WEEKLY
 }
 

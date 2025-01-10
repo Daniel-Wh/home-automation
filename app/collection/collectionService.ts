@@ -5,6 +5,11 @@ export enum CollectionAction {
     decrement = "decrement"
 }
 
+const CollectionHistoryAction = {
+    [CollectionAction.increment]: 'spent',
+    [CollectionAction.decrement]: 'recovered'
+}
+
 
 export async function CreateCollection(userId: string, name: string, budget: number) {
 
@@ -47,17 +52,30 @@ export async function UpdateCollectionBalance(userId: string, name: string, valu
             }
         })
 
+
         const collection = await tx.collection.findFirstOrThrow({
             where: { userId: user.id, name }
         })
-        return await tx.collection.update({
+        const updatedCollection = await tx.collection.update({
             where: {
                 id: collection.id
             },
             data: {
-                balance: action === CollectionAction.decrement ? { decrement: value } : { increment: value }
+                balance: action === CollectionAction.decrement ? { decrement: value } : { increment: value },
+
             }
         })
+
+        await tx.collectionHistory.create({
+            data: {
+                collectionId: collection.id,
+                action: CollectionHistoryAction[action],
+                balance: value,
+                budget: collection.budget - updatedCollection.balance
+            }
+        })
+
+        return updatedCollection
     })
     return collection
 }

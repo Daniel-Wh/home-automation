@@ -21,9 +21,21 @@ model Collection {
   balance Int    @default(0)
   budget  Int    @default(0)
   userId  String
+  description String?
   User    User   @relation(fields: [userId], references: [id])
 
-  @@unique([name, userId])
+  @@index([name, userId])
+  CollectionHistory CollectionHistory[]
+}
+
+model CollectionHistory {
+  id          String @id @default(uuid())
+  collectionId String
+  balance      Int
+  budget       Int
+  action      String
+  createdAt    DateTime @default(now())
+  Collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -45,7 +57,7 @@ model key {
   createdAt   DateTime @default(now())
   deletedAt   DateTime?
   userId      String
-  User        User     @relation(fields: [userId], references: [id])
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
@@ -55,7 +67,7 @@ model AuditLog {
   content     String
   userId      String
   createdAt   DateTime @default(now())
-  User        User     @relation(fields: [userId], references: [id])
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model NotificationSchedule {
@@ -63,5 +75,5 @@ model NotificationSchedule {
   userId      String
   contactType String[] // email, sms, etc...
   frequency   String // daily, weekly, monthly
-  User        User     @relation(fields: [userId], references: [id])
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

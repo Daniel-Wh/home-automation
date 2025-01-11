@@ -7,7 +7,7 @@ export enum CollectionAction {
 
 const CollectionHistoryAction = {
     [CollectionAction.increment]: 'spent',
-    [CollectionAction.decrement]: 'recovered'
+    [CollectionAction.decrement]: 'recovered',
 }
 
 
@@ -95,4 +95,40 @@ export async function GetCollectionByNameAndUser(userId: string, name: string) {
     })
 
     return collection
+}
+
+export async function CollectionTransactions(userId: string, name: string, limit: number = 10) {
+
+    const transactions = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                operations: { increment: 1 },
+                lastOperationAt: new Date()
+            }
+        })
+
+        const collection = await tx.collection.findFirstOrThrow({
+            where: {
+                userId: user.id,
+                name: name.toLowerCase()
+            }
+        })
+
+        return await tx.collectionHistory.findMany({
+            where: {
+                collectionId: collection.id,
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            take: limit
+        })
+
+    })
+
+
+    return transactions
 }

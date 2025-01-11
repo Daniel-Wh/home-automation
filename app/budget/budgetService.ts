@@ -51,7 +51,7 @@ export async function clearBudget(userId: string) {
         }
     })
 
-    const results = { message: `${totalSpent} dollars spent of allotted ${totalBudget}. Collections set to 0 balance` }
+    const results = { message: `${totalSpent} dollars spent of allotted ${totalBudget}. All collections set to 0 dollar balance` }
 
     return results
 }

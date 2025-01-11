@@ -30,7 +30,7 @@ export class NotificationService {
                 }
             })
 
-            console.log('sending messages to users:', usersToSendTo)
+            console.info('sending messages to users:', usersToSendTo)
 
             await Promise.all(usersToSendTo.map(async user => {
                 const { totalBudget, totalSpent, results } = await getBudgetResults(user.id)

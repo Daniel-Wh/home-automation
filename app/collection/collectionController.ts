@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import Joi from 'joi'
-import { CollectionAction, CollectionTransactions, CreateCollection, GetCollectionByNameAndUser, UpdateCollectionBalance } from './collectionService'
+import { CollectionAction, CollectionTransactions, CreateCollection, GetCollectionByNameAndUser, RevertLastCollectionTransaction, UpdateCollectionBalance, UpdateCollectionBudget } from './collectionService'
 import { getDayOfTheWeekFromDate, getMonthFromDate, getNormalizedDayOfMonth } from '../shared/DateFormatting'
 
 export const PostCollectionBody = Joi.object({
@@ -14,6 +14,17 @@ export const PutCollectionBody = Joi.object({
     name: Joi.string().required(),
     value: Joi.number().greater(0).required(),
     action: Joi.string().valid(...Object.values(CollectionAction)).required()
+})
+
+export const PutCollectionBudgetBody = Joi.object({
+    userId: Joi.string().required(),
+    name: Joi.string().required(),
+    value: Joi.number().greater(0).required()
+})
+
+export const DeleteLastCollectionTransactionBody = Joi.object({
+    userId: Joi.string().required(),
+    name: Joi.string().required()
 })
 
 export const GetCollectionBody = Joi.object({
@@ -46,6 +57,28 @@ export async function UpdateCollectionValue(req: Request, res: Response) {
         res.status(201).json({ message: `You have ${collection.budget - collection.balance} dollars remaining on budget item ${collection.name}` })
     } catch (error) {
         res.status(500).json({ message: 'something went wrong', body: req.body })
+    }
+}
+
+export async function PutCollectionBudget(req: Request, res: Response) {
+    try {
+        const { userId, name, value } = req.body
+        const normalizedCollectionName = name.toLowerCase()
+        const collection = await UpdateCollectionBudget(userId, normalizedCollectionName, value)
+        res.status(201).json({ message: `collection ${collection.name} budget updated to ${collection.budget} dollars` })
+    } catch (error) {
+        res.status(500).json({ message: 'something went wrong' })
+    }
+}
+
+export async function DeleteLastCollectionTransaction(req: Request, res: Response) {
+    try {
+        const { userId, name } = req.body
+        const normalizedCollectionName = name.toLowerCase()
+        const collection = await RevertLastCollectionTransaction(userId, normalizedCollectionName)
+        res.status(200).json({ message: `last transaction reverted, you have ${collection.budget - collection.balance} dollars remaining on budget item ${collection.name}` })
+    } catch (error) {
+        res.status(500).json({ message: 'something went wrong' })
     }
 }
 

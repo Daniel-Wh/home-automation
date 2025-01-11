@@ -97,6 +97,88 @@ export async function GetCollectionByNameAndUser(userId: string, name: string) {
     return collection
 }
 
+export async function UpdateCollectionBudget(userId: string, name: string, budget: number) {
+    const collection = prisma.$transaction(async (tx) => {
+        const user = await tx.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                operations: { increment: 1 },
+                lastOperationAt: new Date()
+            }
+        })
+
+        const collection = await tx.collection.findFirstOrThrow({
+            where: {
+                userId: user.id,
+                name: name.toLowerCase()
+            }
+        })
+
+        const updatedCollection = await tx.collection.update({
+            where: {
+                id: collection.id
+            },
+            data: {
+                budget
+            }
+        })
+
+        return updatedCollection
+    })
+
+    return collection
+}
+
+export async function RevertLastCollectionTransaction(userId: string, name: string) {
+    const collection = prisma.$transaction(async (tx) => {
+        const user = await tx.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                operations: { increment: 1 },
+                lastOperationAt: new Date()
+            }
+        })
+
+        const collection = await tx.collection.findFirstOrThrow({
+            where: {
+                userId: user.id,
+                name
+            }
+        })
+
+        const lastTransaction = await tx.collectionHistory.findFirstOrThrow({
+            where: {
+                collectionId: collection.id
+            }
+        })
+
+        const balance = lastTransaction.action === CollectionHistoryAction[CollectionAction.increment] ? { decrement: lastTransaction.balance } : { increment: lastTransaction.balance }
+
+        const updatedCollection = await tx.collection.update({
+            where: {
+                id: collection.id
+            },
+            data: {
+                balance
+            }
+        })
+
+        await tx.collectionHistory.delete({
+            where: {
+                id: lastTransaction.id
+            }
+        })
+
+        return updatedCollection
+    })
+
+    return collection
+}
+
 export async function CollectionTransactions(userId: string, name: string, limit: number = 10) {
 
     const transactions = await prisma.$transaction(async (tx) => {
